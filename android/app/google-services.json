@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "265396507482",
+    "project_id": "kidsrsafe-cc6f9",
+    "storage_bucket": "kidsrsafe-cc6f9.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:265396507482:android:835a0280bc612a2032d963",
+        "android_client_info": {
+          "package_name": "com.example.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCsIjQhXsjJUvSR86SOPQ17M_ruw41ySZM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
