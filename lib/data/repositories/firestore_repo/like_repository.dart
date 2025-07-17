@@ -3,15 +3,18 @@ import '../../models/like_model.dart';
 import '../../models/notification_model.dart';
 import 'post_repository.dart';
 import 'notification_repository.dart';
+import 'package:riverpod/riverpod.dart';
+import '../../providers/firebase_provider.dart';
 
 typedef JsonMap = Map<String, dynamic>;
 
 class LikeRepository {
-  final FirebaseFirestore firestore;
-  LikeRepository({FirebaseFirestore? firestore}) : firestore = firestore ?? FirebaseFirestore.instance;
+  final Ref ref;
+  LikeRepository({required this.ref});
+  FirebaseFirestore get firestore => ref.read(firestoreProvider);
   CollectionReference<JsonMap> get _likes => firestore.collection('likes');
-  final PostRepository _postRepo = PostRepository();
-  final NotificationRepository _notificationRepo = NotificationRepository();
+  PostRepository get _postRepo => PostRepository(ref: ref);
+  NotificationRepository get _notificationRepo => NotificationRepository(ref: ref);
 
   Future<void> likePost({required String userId, required String postId, required String postOwnerId}) async {
     final likeModel = LikeModel(

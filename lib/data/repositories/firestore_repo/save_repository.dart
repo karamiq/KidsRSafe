@@ -3,15 +3,18 @@ import '../../models/save_model.dart';
 import '../../models/notification_model.dart';
 import 'post_repository.dart';
 import 'notification_repository.dart';
+import 'package:riverpod/riverpod.dart';
+import '../../providers/firebase_provider.dart';
 
 typedef JsonMap = Map<String, dynamic>;
 
 class SaveRepository {
-  final FirebaseFirestore firestore;
-  SaveRepository({FirebaseFirestore? firestore}) : firestore = firestore ?? FirebaseFirestore.instance;
+  final Ref ref;
+  SaveRepository({required this.ref});
+  FirebaseFirestore get firestore => ref.read(firestoreProvider);
   CollectionReference<JsonMap> get _saves => firestore.collection('saves');
-  final PostRepository _postRepo = PostRepository();
-  final NotificationRepository _notificationRepo = NotificationRepository();
+  PostRepository get _postRepo => PostRepository(ref: ref);
+  NotificationRepository get _notificationRepo => NotificationRepository(ref: ref);
 
   Future<void> savePost({required String userId, required String postId, required String postOwnerId}) async {
     final saveModel = SaveModel(

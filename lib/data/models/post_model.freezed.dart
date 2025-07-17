@@ -460,7 +460,8 @@ extension PostModelPatterns on PostModel {
 }
 
 /// @nodoc
-@JsonSerializable()
+
+@jsonSerializable
 class _PostModel implements PostModel {
   const _PostModel(
       {required this.uid,

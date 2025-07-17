@@ -25,6 +25,7 @@ class UserRepository {
     required DateTime dateOfBirth,
     required String profilePicture,
     String? parentEmail,
+    required String userName,
   }) async {
     final docRef = _users.doc(uid);
 
@@ -35,6 +36,7 @@ class UserRepository {
       uid: uid,
       email: email,
       name: displayName,
+      username: userName,
       role: UserRole.kid,
       dateOfBirth: dateOfBirth,
       createdAt: DateTime.now(),
@@ -143,10 +145,10 @@ class UserRepository {
     final user = await getUser(uid);
     if (user == null) return null;
 
-    final followRepo = FollowRepository();
-    final postRepo = PostRepository();
-    final saveRepo = SaveRepository();
-    final likeRepo = LikeRepository();
+    final followRepo = FollowRepository(ref: ref);
+    final postRepo = PostRepository(ref: ref);
+    final saveRepo = SaveRepository(ref: ref);
+    final likeRepo = LikeRepository(ref: ref);
 
     final followers = await followRepo.getFollowers(uid);
     final following = await followRepo.getFollowing(uid);
@@ -184,5 +186,33 @@ class UserRepository {
   Future<List<UserModel>> getUsersByStatus(UserStatus status) async {
     final query = await _users.where('status', isEqualTo: status.name).get();
     return query.docs.map((doc) => UserModel.fromJson(doc.data())).toList();
+  }
+
+  /// Search users by name or username (prefix search), excluding the current user
+  Stream<List<UserModel>> searchUsers(String query, String excludeUid) {
+    final nameQuery = _users
+        .where('name', isGreaterThanOrEqualTo: query)
+        .where('name', isLessThanOrEqualTo: '$query\uf8ff');
+    final usernameQuery = _users
+        .where('username', isGreaterThanOrEqualTo: query)
+        .where('username', isLessThanOrEqualTo: '$query\uf8ff');
+
+    // Combine both queries using snapshots and merge results
+    // (Firestore doesn't support OR natively, so you may need to run both and merge in Dart)
+    final nameStream = nameQuery.snapshots().map((snapshot) => snapshot.docs
+        .where((doc) => doc.id != excludeUid)
+        .map((doc) => UserModel.fromJson(doc.data()))
+        .toList());
+    final usernameStream = usernameQuery.snapshots().map((snapshot) => snapshot.docs
+        .where((doc) => doc.id != excludeUid)
+        .map((doc) => UserModel.fromJson(doc.data()))
+        .toList());
+
+    return nameStream.asyncMap((nameResults) async {
+      final usernameResults = await usernameStream.first;
+      // Merge and deduplicate by uid
+      final all = {...nameResults, ...usernameResults};
+      return all.toList();
+    });
   }
 }

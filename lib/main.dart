@@ -11,12 +11,11 @@ const String appName = 'App';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   final sharedPreferences = await SharedPreferences.getInstance();
+
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
   timeago.setLocaleMessages('ar', timeago.ArMessages()); // Add french messages
 
   // HttpOverrides.global = MyHttpOverrides();

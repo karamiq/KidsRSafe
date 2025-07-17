@@ -1,15 +1,18 @@
+import 'package:app/data/providers/firebase_provider.dart';
 import 'package:app/main.dart';
 import 'package:app/router/app_router.dart';
-import 'package:app/data/providers/settings_provider.dart';
 import 'package:app/core/theme/app_theme.dart';
 import 'package:app/core/utils/extensions.dart';
 import 'package:app/core/utils/snackbar.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 //import 'package:flutter_kurdish_localization/kurdish_material_localization_delegate.dart';
 //import 'package:flutter_kurdish_localization/kurdish_widget_localization_delegate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_framework/responsive_framework.dart';
+import 'package:app/core/services/local_notifications_services.dart';
+import 'package:awesome_notifications/awesome_notifications.dart';
 
 class App extends ConsumerStatefulWidget {
   const App({super.key});
@@ -19,19 +22,14 @@ class App extends ConsumerStatefulWidget {
 }
 
 class _AppState extends ConsumerState<App> {
-  // @override
-  // void initState() {
-  //   super.initState();
-
-  //   initializeFirebaseMessaging();
-  //   FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-  //     debugPrint("remote message received: ${message.messageId}");
-  //     debugPrint("notification received: ${message.notification?.body}");
-  //     if (message.notification != null) {
-  //       LocalNotificationsServices.showNotification(message);
-  //     }
-  //   });
-  // }
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      LocalNotificationsServices.initialize();
+      ref.read(firebaseMessegingServiceProvider).initialize();
+    });
+  }
 
   // @override
   // void initState() {
@@ -49,15 +47,11 @@ class _AppState extends ConsumerState<App> {
   @override
   Widget build(BuildContext context) {
     final theme = AppTheme();
-    final settings = ref.watch(settingsProvider);
-
     return MaterialApp.router(
       title: appName,
       debugShowCheckedModeBanner: false,
       routerConfig: router,
       scaffoldMessengerKey: Utils.messengerKey,
-      // Locale
-      //   locale: settings.locale,
       locale: const Locale('en'),
       onGenerateTitle: (context) => context.l10n.appName,
       localizationsDelegates: const [

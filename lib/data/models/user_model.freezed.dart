@@ -17,6 +17,7 @@ mixin _$UserModel {
   String get uid;
   String get email;
   String get name;
+  String get username;
   String get profilePicture;
   UserRole get role;
   DateTime get dateOfBirth;
@@ -44,6 +45,8 @@ mixin _$UserModel {
             (identical(other.uid, uid) || other.uid == uid) &&
             (identical(other.email, email) || other.email == email) &&
             (identical(other.name, name) || other.name == name) &&
+            (identical(other.username, username) ||
+                other.username == username) &&
             (identical(other.profilePicture, profilePicture) ||
                 other.profilePicture == profilePicture) &&
             (identical(other.role, role) || other.role == role) &&
@@ -67,6 +70,7 @@ mixin _$UserModel {
       uid,
       email,
       name,
+      username,
       profilePicture,
       role,
       dateOfBirth,
@@ -78,7 +82,7 @@ mixin _$UserModel {
 
   @override
   String toString() {
-    return 'UserModel(uid: $uid, email: $email, name: $name, profilePicture: $profilePicture, role: $role, dateOfBirth: $dateOfBirth, parentEmail: $parentEmail, createdAt: $createdAt, status: $status, assignedModerator: $assignedModerator, parentalApproved: $parentalApproved)';
+    return 'UserModel(uid: $uid, email: $email, name: $name, username: $username, profilePicture: $profilePicture, role: $role, dateOfBirth: $dateOfBirth, parentEmail: $parentEmail, createdAt: $createdAt, status: $status, assignedModerator: $assignedModerator, parentalApproved: $parentalApproved)';
   }
 }
 
@@ -91,6 +95,7 @@ abstract mixin class $UserModelCopyWith<$Res> {
       {String uid,
       String email,
       String name,
+      String username,
       String profilePicture,
       UserRole role,
       DateTime dateOfBirth,
@@ -116,6 +121,7 @@ class _$UserModelCopyWithImpl<$Res> implements $UserModelCopyWith<$Res> {
     Object? uid = null,
     Object? email = null,
     Object? name = null,
+    Object? username = null,
     Object? profilePicture = null,
     Object? role = null,
     Object? dateOfBirth = null,
@@ -137,6 +143,10 @@ class _$UserModelCopyWithImpl<$Res> implements $UserModelCopyWith<$Res> {
       name: null == name
           ? _self.name
           : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      username: null == username
+          ? _self.username
+          : username // ignore: cast_nullable_to_non_nullable
               as String,
       profilePicture: null == profilePicture
           ? _self.profilePicture
@@ -271,6 +281,7 @@ extension UserModelPatterns on UserModel {
             String uid,
             String email,
             String name,
+            String username,
             String profilePicture,
             UserRole role,
             DateTime dateOfBirth,
@@ -289,6 +300,7 @@ extension UserModelPatterns on UserModel {
             _that.uid,
             _that.email,
             _that.name,
+            _that.username,
             _that.profilePicture,
             _that.role,
             _that.dateOfBirth,
@@ -321,6 +333,7 @@ extension UserModelPatterns on UserModel {
             String uid,
             String email,
             String name,
+            String username,
             String profilePicture,
             UserRole role,
             DateTime dateOfBirth,
@@ -338,6 +351,7 @@ extension UserModelPatterns on UserModel {
             _that.uid,
             _that.email,
             _that.name,
+            _that.username,
             _that.profilePicture,
             _that.role,
             _that.dateOfBirth,
@@ -369,6 +383,7 @@ extension UserModelPatterns on UserModel {
             String uid,
             String email,
             String name,
+            String username,
             String profilePicture,
             UserRole role,
             DateTime dateOfBirth,
@@ -386,6 +401,7 @@ extension UserModelPatterns on UserModel {
             _that.uid,
             _that.email,
             _that.name,
+            _that.username,
             _that.profilePicture,
             _that.role,
             _that.dateOfBirth,
@@ -408,6 +424,7 @@ class _UserModel implements UserModel {
       {required this.uid,
       required this.email,
       required this.name,
+      required this.username,
       required this.profilePicture,
       required this.role,
       required this.dateOfBirth,
@@ -425,6 +442,8 @@ class _UserModel implements UserModel {
   final String email;
   @override
   final String name;
+  @override
+  final String username;
   @override
   final String profilePicture;
   @override
@@ -466,6 +485,8 @@ class _UserModel implements UserModel {
             (identical(other.uid, uid) || other.uid == uid) &&
             (identical(other.email, email) || other.email == email) &&
             (identical(other.name, name) || other.name == name) &&
+            (identical(other.username, username) ||
+                other.username == username) &&
             (identical(other.profilePicture, profilePicture) ||
                 other.profilePicture == profilePicture) &&
             (identical(other.role, role) || other.role == role) &&
@@ -489,6 +510,7 @@ class _UserModel implements UserModel {
       uid,
       email,
       name,
+      username,
       profilePicture,
       role,
       dateOfBirth,
@@ -500,7 +522,7 @@ class _UserModel implements UserModel {
 
   @override
   String toString() {
-    return 'UserModel(uid: $uid, email: $email, name: $name, profilePicture: $profilePicture, role: $role, dateOfBirth: $dateOfBirth, parentEmail: $parentEmail, createdAt: $createdAt, status: $status, assignedModerator: $assignedModerator, parentalApproved: $parentalApproved)';
+    return 'UserModel(uid: $uid, email: $email, name: $name, username: $username, profilePicture: $profilePicture, role: $role, dateOfBirth: $dateOfBirth, parentEmail: $parentEmail, createdAt: $createdAt, status: $status, assignedModerator: $assignedModerator, parentalApproved: $parentalApproved)';
   }
 }
 
@@ -516,6 +538,7 @@ abstract mixin class _$UserModelCopyWith<$Res>
       {String uid,
       String email,
       String name,
+      String username,
       String profilePicture,
       UserRole role,
       DateTime dateOfBirth,
@@ -541,6 +564,7 @@ class __$UserModelCopyWithImpl<$Res> implements _$UserModelCopyWith<$Res> {
     Object? uid = null,
     Object? email = null,
     Object? name = null,
+    Object? username = null,
     Object? profilePicture = null,
     Object? role = null,
     Object? dateOfBirth = null,
@@ -562,6 +586,10 @@ class __$UserModelCopyWithImpl<$Res> implements _$UserModelCopyWith<$Res> {
       name: null == name
           ? _self.name
           : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      username: null == username
+          ? _self.username
+          : username // ignore: cast_nullable_to_non_nullable
               as String,
       profilePicture: null == profilePicture
           ? _self.profilePicture

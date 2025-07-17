@@ -23,7 +23,7 @@ Map<String, dynamic> _$NotificationModelToJson(_NotificationModel instance) =>
       'title': instance.title,
       'body': instance.body,
       'createdAt': instance.createdAt.toIso8601String(),
-      'type': instance.type,
+      'type': instance.type.toJson(),
     };
 
 const _$NotificationTypeEnumMap = {

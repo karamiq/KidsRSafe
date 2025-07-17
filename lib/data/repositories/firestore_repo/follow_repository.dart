@@ -2,14 +2,16 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../models/follow_model.dart';
 import '../../models/notification_model.dart';
 import 'notification_repository.dart';
+import 'package:riverpod/riverpod.dart';
+import '../../providers/firebase_provider.dart';
 
 typedef JsonMap = Map<String, dynamic>;
 
 class FollowRepository {
-  final FirebaseFirestore firestore;
-  final NotificationRepository _notificationRepo = NotificationRepository();
-
-  FollowRepository({FirebaseFirestore? firestore}) : firestore = firestore ?? FirebaseFirestore.instance;
+  final Ref ref;
+  FollowRepository({required this.ref});
+  FirebaseFirestore get firestore => ref.read(firestoreProvider);
+  NotificationRepository get _notificationRepo => NotificationRepository(ref: ref);
   CollectionReference<JsonMap> get _follows => firestore.collection('follows');
 
   Future<void> followUser({required String followerId, required String followingId}) async {

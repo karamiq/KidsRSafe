@@ -3,15 +3,18 @@ import '../../models/comment_model.dart';
 import '../../models/notification_model.dart';
 import 'post_repository.dart';
 import 'notification_repository.dart';
+import 'package:riverpod/riverpod.dart';
+import '../../providers/firebase_provider.dart';
 
 typedef JsonMap = Map<String, dynamic>;
 
 class CommentRepository {
-  final FirebaseFirestore firestore;
-  CommentRepository({FirebaseFirestore? firestore}) : firestore = firestore ?? FirebaseFirestore.instance;
+  final Ref ref;
+  CommentRepository({required this.ref});
+  FirebaseFirestore get firestore => ref.read(firestoreProvider);
   CollectionReference<JsonMap> get _comments => firestore.collection('comments');
-  final PostRepository _postRepo = PostRepository();
-  final NotificationRepository _notificationRepo = NotificationRepository();
+  PostRepository get _postRepo => PostRepository(ref: ref);
+  NotificationRepository get _notificationRepo => NotificationRepository(ref: ref);
 
   Future<String> addComment({
     required String userId,

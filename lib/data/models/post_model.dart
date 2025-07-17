@@ -1,3 +1,4 @@
+import 'package:app/core/utils/annotations/json_serializable.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'post_model.freezed.dart';
@@ -11,9 +12,6 @@ enum PostStatus {
   approved,
   @JsonValue('rejected')
   rejected;
-
-  factory PostStatus.fromJson(String json) => PostStatus.values.firstWhere((e) => e.toJson() == json);
-  String toJson() => name;
 }
 
 @JsonEnum(alwaysCreate: true)
@@ -22,13 +20,11 @@ enum PostType {
   video,
   @JsonValue('photo')
   photo;
-
-  factory PostType.fromJson(String json) => PostType.values.firstWhere((e) => e.toJson() == json);
-  String toJson() => name;
 }
 
 @freezed
 abstract class PostModel with _$PostModel {
+  @jsonSerializable
   const factory PostModel({
     required String uid,
     required String title,

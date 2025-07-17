@@ -13,6 +13,18 @@ service firebase.storage {
       allow write: if request.auth != null && request.auth.uid == userId;
     }
     
+    // Allow authenticated users to upload profile pictures (alternative path)
+    match /profile_pictures/{allPaths=**} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+    
+    // Allow authenticated users to upload posts
+    match /posts/{postId}/{allPaths=**} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+    
     // Default rule - deny all
     match /{allPaths=**} {
       allow read, write: if false;

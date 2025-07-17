@@ -11,6 +11,7 @@ abstract class UserModel with _$UserModel {
     required String uid,
     required String email,
     required String name,
+    required String username,
     required String profilePicture,
     required UserRole role,
     required DateTime dateOfBirth,
@@ -20,7 +21,6 @@ abstract class UserModel with _$UserModel {
     required String? assignedModerator,
     @Default(false) bool parentalApproved,
   }) = _UserModel;
-
   factory UserModel.fromJson(Map<String, dynamic> json) => _$UserModelFromJson(json);
 }
 

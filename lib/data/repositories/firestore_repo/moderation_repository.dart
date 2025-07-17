@@ -1,11 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../models/moderation_model.dart';
+import 'package:riverpod/riverpod.dart';
+import '../../providers/firebase_provider.dart';
 
 typedef JsonMap = Map<String, dynamic>;
 
 class ModerationRepository {
-  final FirebaseFirestore firestore;
-  ModerationRepository({FirebaseFirestore? firestore}) : firestore = firestore ?? FirebaseFirestore.instance;
+  final Ref ref;
+  ModerationRepository({required this.ref});
+  FirebaseFirestore get firestore => ref.read(firestoreProvider);
   CollectionReference<JsonMap> get _queue => firestore.collection('moderation_queue');
 
   Future<String> addToQueue({

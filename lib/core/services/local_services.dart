@@ -1,7 +1,15 @@
+import 'dart:io';
+import 'dart:typed_data';
+import 'dart:ui' as ui;
+
 import 'package:app/core/services/clients/callback.dart';
 import 'package:app/core/utils/extensions.dart';
-import 'package:flutter/foundation.dart';
+import 'package:app/core/utils/snackbar.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
@@ -29,6 +37,32 @@ Future<void> fetchPage<T>({
   }
 }
 
+final ImagePicker imagePickerInstance = ImagePicker();
+Future<String?> pickVideo() async {
+  final XFile? file = await imagePickerInstance.pickVideo(
+    source: ImageSource.gallery,
+  );
+  if (file != null) {
+    return File(file.path).path;
+  } else {
+    return null;
+  }
+}
+
+Future<String?> pickImage() async {
+  final XFile? file = await imagePickerInstance.pickImage(
+    source: ImageSource.gallery,
+    maxWidth: 1024,
+    maxHeight: 1024,
+    imageQuality: 85,
+  );
+  if (file != null) {
+    return File(file.path).path;
+  } else {
+    return null;
+  }
+}
+
 Future<void> launchNotNullUrlString(String? url, {VoidCallback? orElse}) async {
   if (url != null && (url.contains("https") || url.contains("http"))) {
     launchUrlString(url, mode: LaunchMode.externalApplication);
@@ -40,17 +74,13 @@ Future<void> launchNotNullUrlString(String? url, {VoidCallback? orElse}) async {
 Future<void> openCall(String phoneNumber) async {
   try {
     await launchUrlString("tel:$phoneNumber");
-  } catch (_) {
-    if (kDebugMode) print("error: tel:$phoneNumber");
-  }
+  } catch (_) {}
 }
 
 Future<void> openMail(String mail) async {
   try {
     await launchUrlString("mailto:$mail");
-  } catch (_) {
-    if (kDebugMode) print("error: mailto:$mail");
-  }
+  } catch (_) {}
 }
 
 Future<void> openSMSMessage(String phoneNumber, {String? message}) async {
@@ -161,84 +191,58 @@ String getCompletedPhoneNumber(String phoneNumber, String countryCode) {
 
 String getEncodedComponent(String component) => Uri.encodeComponent(component);
 
-// Future<void> initializeFirebaseMessaging() async {
-//   FirebaseMessaging messaging = FirebaseMessaging.instance;
+Widget handleSnapshotState<T>(
+  BuildContext context,
+  AsyncSnapshot<T?> snapshot, {
+  required Widget Function() onLoading,
+  required Widget Function(Object?) onError,
+  required Widget Function(T?) onData,
+}) {
+  if (snapshot.connectionState == ConnectionState.waiting) {
+    return onLoading();
+  } else if (snapshot.hasError) {
+    return onError(snapshot.error);
+  } else if (snapshot.hasData) {
+    return onData(snapshot.data);
+  } else {
+    return onLoading();
+  }
+}
 
-//   await messaging.requestPermission();
+Widget handleQueryBuilderSnapshotState<T>(
+  BuildContext context,
+  dynamic snapshot, {
+  required Widget Function() onLoading,
+  required Widget Function(Object?) onError,
+  required Widget Function(List<QueryDocumentSnapshot<T>>) onData,
+}) {
+  if (snapshot.isFetching) {
+    return onLoading();
+  } else if (snapshot.hasError) {
+    return onError(snapshot.error);
+  } else if (snapshot.hasData) {
+    return onData(snapshot.docs);
+  } else {
+    return onLoading();
+  }
+}
 
-//   // Retrieve the FCM token
-//   Future<void> retrieveFCMAndAPNsToken() async {
-//     // Request permission for remote notifications
-//     await messaging.requestPermission();
+Widget buildError(BuildContext context, Object? error) {
+  debugPrint(error.toString());
+  if (error is FirebaseException) {
+    return Center(child: Text(error.message ?? context.l10n.defaultErrorMessage));
+  } else {
+    return Center(child: Text(error?.toString() ?? context.l10n.defaultErrorMessage));
+  }
+}
 
-//     // Retrieve the FCM token
-//     final fcmToken = await messaging.getToken();
-//     final apnsToken = await messaging.getAPNSToken();
-//     debugPrint('FCM Token: $fcmToken');
-//     debugPrint('APNs Token: $apnsToken');
-//   }
-
-//   await retrieveFCMAndAPNsToken();
-
-//   await messaging.subscribeToTopic("all");
-
-
-// }
-
-// Widget handleSnapshotState<T>(
-//   BuildContext context,
-//   AsyncSnapshot<T?> snapshot, {
-//   required Widget Function() onLoading,
-//   required Widget Function(Object?) onError,
-//   required Widget Function(T?) onData,
-// }) {
-//   if (snapshot.connectionState == ConnectionState.waiting) {
-//           return onLoading();
-//         } else if (snapshot.hasError) {
-//           return onError(snapshot.error);
-//         } else if (snapshot.hasData) {
-//           return onData(snapshot.data);
-//         } else {
-//           return onLoading();
-//         }
-// }
-
-// Widget handleQueryBuilderSnapshotState<T>(
-//   BuildContext context,
-//   FirestoreQueryBuilderSnapshot<T> snapshot, {
-//   required Widget Function() onLoading,
-//   required Widget Function(Object?) onError,
-//   required Widget Function(List<QueryDocumentSnapshot<T>>) onData,
-// }) {
-//   if (snapshot.isFetching) {
-//           return onLoading();
-//         } else if (snapshot.hasError) {
-//           return onError(snapshot.error);
-//         } else if (snapshot.hasData) {
-//           return onData(snapshot.docs);
-//         } else {
-//           return onLoading();
-//         }
-// }
-
-// Widget buildError(BuildContext context, Object? error) {
-//   debugPrint(error.toString());
-//   if (error is FirebaseException) {
-//     return Center(
-//         child: Text(error.message ?? context.l10n.defaultErrorMessage));
-//   } else {
-//     return Center(
-//         child: Text(error?.toString() ?? context.l10n.defaultErrorMessage));
-//   }
-// }
-
-// void handleErrorMessageSnackBar(BuildContext context, Object? error){
-//   if(error is FirebaseException){
-//     context.showErrorSnackBar(error.message ?? context.l10n.defaultErrorMessage);
-//   }else{
-//     context.showErrorSnackBar(error?.toString() ?? context.l10n.defaultErrorMessage);
-//   }
-// }
+void handleErrorMessageSnackBar(BuildContext context, Object? error) {
+  if (error is FirebaseException) {
+    context.showErrorSnackBar(error.message ?? context.l10n.defaultErrorMessage);
+  } else {
+    context.showErrorSnackBar(error?.toString() ?? context.l10n.defaultErrorMessage);
+  }
+}
 
 // String getImageFromYoutubeUrl(String url) {
 //   String? id = YoutubePlayer.convertUrlToId(url);
@@ -248,11 +252,10 @@ String getEncodedComponent(String component) => Uri.encodeComponent(component);
 //   return "";
 // }
 
-// Future<Uint8List?> convertWidgetToImage(GlobalKey globalKey) async {
-//   RenderRepaintBoundary boundary =
-//       globalKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
-//   ui.Image image = await boundary.toImage(pixelRatio: 100);
-//   ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-//   Uint8List? pngBytes = byteData?.buffer.asUint8List();
-//   return pngBytes;
-// }
+Future<Uint8List?> convertWidgetToImage(GlobalKey globalKey) async {
+  RenderRepaintBoundary boundary = globalKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+  ui.Image image = await boundary.toImage(pixelRatio: 100);
+  ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+  Uint8List? pngBytes = byteData?.buffer.asUint8List();
+  return pngBytes;
+}

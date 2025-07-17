@@ -288,7 +288,8 @@ extension NotificationModelPatterns on NotificationModel {
 }
 
 /// @nodoc
-@JsonSerializable()
+
+@jsonSerializable
 class _NotificationModel implements NotificationModel {
   const _NotificationModel(
       {required this.uid,

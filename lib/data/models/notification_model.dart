@@ -1,3 +1,4 @@
+import 'package:app/core/utils/annotations/json_serializable.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'notification_model.freezed.dart';
@@ -25,6 +26,7 @@ enum NotificationType {
 
 @freezed
 abstract class NotificationModel with _$NotificationModel {
+  @jsonSerializable
   const factory NotificationModel({
     required String uid,
     required String userUid,

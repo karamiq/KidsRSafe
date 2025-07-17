@@ -1,73 +1,99 @@
+import 'dart:io';
+
+import 'package:app/core/services/file_upload_service.dart';
 import 'package:app/data/models/notification_model.dart';
+import 'package:app/data/models/user_model.dart';
+import 'package:app/data/providers/user_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:app/core/utils/constants/firestore_constants.dart';
 import '../../models/post_model.dart';
 import 'moderation_repository.dart';
 import 'notification_repository.dart';
+import 'package:riverpod/riverpod.dart';
+import '../../providers/firebase_provider.dart';
 
 typedef JsonMap = Map<String, dynamic>;
 
 class PostRepository {
-  final FirebaseFirestore firestore;
-  PostRepository({FirebaseFirestore? firestore}) : firestore = firestore ?? FirebaseFirestore.instance;
-  final CollectionReference<JsonMap> _posts =
-      FirebaseFirestore.instance.collection(FirestoreCollections.posts);
-  final ModerationRepository _moderationRepo = ModerationRepository();
-  final NotificationRepository _notificationRepo = NotificationRepository();
-
+  final Ref ref;
+  PostRepository({required this.ref});
+  FirebaseFirestore get firestore => ref.read(firestoreProvider);
+  CollectionReference<JsonMap> get _posts => firestore.collection(FirestoreCollections.posts);
+  ModerationRepository get _moderationRepo => ModerationRepository(ref: ref);
+  NotificationRepository get _notificationRepo => NotificationRepository(ref: ref);
+  UserRole get publisherRole => ref.read(userProvider)!.role;
   Future<String> submitPostForModeration({
+    required String title,
     required String userId,
     required PostType type,
-    required List<String> urls,
+    required List<File> files,
     required String caption,
-    List<String>? categories,
-    List<String>? tags,
-    String? thumbnailUrl,
     int? duration,
     String? music,
   }) async {
-    final docRef = _posts.doc();
-    final postId = docRef.id;
+    try {
+      final docRef = _posts.doc();
+      final postId = docRef.id;
 
-    // Add to moderation queue first
-    await _moderationRepo.addToQueue(
-      postId: postId,
-      submittedBy: userId,
-    );
+      // Add to moderation queue first
+      await _moderationRepo.addToQueue(
+        postId: postId,
+        submittedBy: userId,
+      );
 
-    // Create the post with pending status
-    final post = PostModel(
-      uid: postId,
-      title: caption, // Use caption as title for now
-      userUid: userId,
-      type: type,
-      urls: urls,
-      caption: caption,
-      duration: duration,
-      status: PostStatus.pending,
-      createdAt: DateTime.now(),
-      likes: 0,
-      saves: 0,
-      views: 0,
-      comments: 0,
-      moderatorUid: null,
-      moderatedAt: null,
-    );
+      // Upload files to Cloudinary
+      final cloudinary = ref.read(fileUploadServiceProvider);
+      final urls = <String>[];
+      for (var file in files) {
+        final url = await cloudinary.uploadFile(file, path: 'posts/$postId');
+        if (url != null) {
+          urls.add(url);
+        }
+      }
 
-    await docRef.set(post.toJson());
+      if (urls.isEmpty) {
+        throw Exception('No files were uploaded successfully');
+      }
 
-    // Notify user
-    await _notificationRepo.sendNotification(
-      userId: userId,
-      title: 'Post Submitted',
-      body: 'Your post is submitted for moderation.',
-      type: NotificationType.postPending,
-    );
+      final post = PostModel(
+        uid: postId,
+        title: title,
+        userUid: userId,
+        type: type,
+        urls: urls,
+        caption: caption,
+        duration: duration,
+        status: publisherRole != UserRole.kid ? PostStatus.approved : PostStatus.pending,
+        createdAt: DateTime.now(),
+        likes: 0,
+        saves: 0,
+        views: 0,
+        comments: 0,
+        moderatorUid: null,
+        moderatedAt: null,
+      );
 
-    return postId;
+      await docRef.set(post.toJson());
+
+      // Notify user (don't let this block the main operation)
+      try {
+        await _notificationRepo.sendNotification(
+          userId: userId,
+          title: 'Post Submitted',
+          body: 'Your post is submitted for moderation.',
+          type: NotificationType.postPending,
+        );
+      } catch (notificationError) {
+        // print('Notification failed but continuing: $notificationError');
+      }
+
+      return postId;
+    } catch (e) {
+      // print('Error in submitPostForModeration: $e');
+      rethrow;
+    }
   }
 
-  /// Called by moderator to approve/reject post, updates post status and notifies user
   Future<void> moderatePost({
     required String postId,
     required String moderatorId,
@@ -208,6 +234,32 @@ class PostRepository {
   Future<void> decrementComments(String postId) async {
     await _posts.doc(postId).update({
       'comments': FieldValue.increment(-1),
+    });
+  }
+
+  /// Search approved posts by title or caption (prefix search)
+  Stream<List<PostModel>> searchPosts(String query) {
+    final titleQuery = _posts
+        .where('status', isEqualTo: PostStatus.approved.name)
+        .where('title', isGreaterThanOrEqualTo: query)
+        .where('title', isLessThanOrEqualTo: '$query\uf8ff');
+    final captionQuery = _posts
+        .where('status', isEqualTo: PostStatus.approved.name)
+        .where('caption', isGreaterThanOrEqualTo: query)
+        .where('caption', isLessThanOrEqualTo: '$query\uf8ff');
+
+    final titleStream = titleQuery
+        .snapshots()
+        .map((snapshot) => snapshot.docs.map((doc) => PostModel.fromJson(doc.data())).toList());
+    final captionStream = captionQuery
+        .snapshots()
+        .map((snapshot) => snapshot.docs.map((doc) => PostModel.fromJson(doc.data())).toList());
+
+    return titleStream.asyncMap((titleResults) async {
+      final captionResults = await captionStream.first;
+      // Merge and deduplicate by uid
+      final all = {...titleResults, ...captionResults};
+      return all.toList();
     });
   }
 }

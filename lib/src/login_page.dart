@@ -1,14 +1,8 @@
 import 'package:app/common_lib.dart';
 import 'package:app/core/services/clients/_clients.dart';
-import 'package:app/core/utils/widgets/form_fields/custom_text_form_field.dart';
-import 'package:app/router/app_router.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/providers/auth_provider.dart';
-import 'package:go_router/go_router.dart';
 import '../core/utils/widgets/buttons/filled_loading_button.dart';
-import '../core/utils/snackbar.dart';
-import 'package:app/core/utils/constants/sizes.dart';
 
 class LoginPage extends ConsumerWidget {
   const LoginPage({super.key});

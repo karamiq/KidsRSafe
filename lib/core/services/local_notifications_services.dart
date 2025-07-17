@@ -1,49 +1,40 @@
-// import 'dart:convert';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:awesome_notifications/awesome_notifications.dart';
 
-// import 'package:firebase_messaging/firebase_messaging.dart';
-// import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+abstract class LocalNotificationsServices {
+  const LocalNotificationsServices();
 
-// abstract class LocalNotificationsServices {
-//   const LocalNotificationsServices();
-//   static Future<void> initalize() async {
-//     const AndroidInitializationSettings initializationSettingsAndroid =
-//         AndroidInitializationSettings('mipmap/ic_launcher');
-//     DarwinInitializationSettings initializationSettingsDarwin =
-//         DarwinInitializationSettings(
-//       onDidReceiveLocalNotification: (id, title, body, payload) async {
-//         final details = await _notificationDetails();
-//        await FlutterLocalNotificationsPlugin()
-//             .show(id, title, body, details, payload: payload);
-//       },
-//     );
-//     const LinuxInitializationSettings initializationSettingsLinux =
-//         LinuxInitializationSettings(defaultActionName: 'Open notification');
-//      InitializationSettings initializationSettings =
-//         InitializationSettings(
-//             android: initializationSettingsAndroid,
-//             iOS: initializationSettingsDarwin,
-//             linux: initializationSettingsLinux);
-//     await FlutterLocalNotificationsPlugin().initialize(initializationSettings);
-//   }
+  static Future<void> initialize() async {
+    await AwesomeNotifications().initialize(
+      null, // icon for notification, null uses default app icon
+      [
+        NotificationChannel(
+          channelKey: 'main_channel',
+          channelName: 'Main Notifications',
+          channelDescription: 'Main notification channel',
+          defaultColor: null,
+          importance: NotificationImportance.High,
+          channelShowBadge: true,
+          playSound: true,
+        ),
+      ],
+      debug: false,
+    );
+  }
 
-//   static Future<NotificationDetails> _notificationDetails() async {
-//     const AndroidNotificationDetails androidNotificationDetails =
-//         AndroidNotificationDetails("channel_id", "MainNotifications",
-//             channelDescription: "Main Notifications",
-//             priority: Priority.max,
-//             importance: Importance.max,
-//             playSound: true);
-//     const DarwinNotificationDetails iosNotificationDetails =
-//         DarwinNotificationDetails();
+  static NotificationContent _notificationContent(RemoteMessage message) {
+    return NotificationContent(
+      id: 3,
+      channelKey: 'main_channel',
+      title: message.notification?.title,
+      body: message.notification?.body,
+      payload: message.data.map((key, value) => MapEntry(key, value.toString())),
+    );
+  }
 
-//     return const NotificationDetails(
-//         android: androidNotificationDetails, iOS: iosNotificationDetails);
-//   }
-
-//   static Future<void> showNotification(RemoteMessage message) async {
-//     final details = await _notificationDetails();
-//     await FlutterLocalNotificationsPlugin().show(
-//         3, message.notification?.title, message.notification?.body, details,
-//         payload: jsonEncode(message.data));
-//   }
-// }
+  static Future<void> showNotification(RemoteMessage message) async {
+    await AwesomeNotifications().createNotification(
+      content: _notificationContent(message),
+    );
+  }
+}

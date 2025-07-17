@@ -4,7 +4,6 @@ import 'package:app/data/models/post_model.dart';
 import 'package:app/data/models/user_model.dart';
 import 'package:app/data/repositories/firestore_repo/comment_repository.dart';
 import 'package:app/data/repositories/firestore_repo/user_repository.dart';
-import 'package:app/core/utils/constants/sizes.dart';
 import 'package:flutter/material.dart';
 
 class CommentsSection extends ConsumerStatefulWidget {
@@ -38,7 +37,7 @@ class _CommentsSectionState extends ConsumerState<CommentsSection> {
   @override
   void initState() {
     super.initState();
-    _commentRepository = CommentRepository();
+    _commentRepository = CommentRepository(ref: ref as Ref);
     _userRepository = UserRepository(ref: ref as Ref);
     _loadComments();
   }

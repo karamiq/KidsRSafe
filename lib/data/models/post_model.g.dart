@@ -10,11 +10,11 @@ _PostModel _$PostModelFromJson(Map<String, dynamic> json) => _PostModel(
       uid: json['uid'] as String,
       title: json['title'] as String,
       userUid: json['userUid'] as String,
-      type: PostType.fromJson(json['type'] as String),
+      type: $enumDecode(_$PostTypeEnumMap, json['type']),
       urls: (json['urls'] as List<dynamic>).map((e) => e as String).toList(),
       caption: json['caption'] as String,
       duration: (json['duration'] as num?)?.toInt(),
-      status: PostStatus.fromJson(json['status'] as String),
+      status: $enumDecode(_$PostStatusEnumMap, json['status']),
       createdAt: DateTime.parse(json['createdAt'] as String),
       likes: (json['likes'] as num).toInt(),
       saves: (json['saves'] as num).toInt(),
@@ -31,11 +31,11 @@ Map<String, dynamic> _$PostModelToJson(_PostModel instance) =>
       'uid': instance.uid,
       'title': instance.title,
       'userUid': instance.userUid,
-      'type': instance.type,
+      'type': _$PostTypeEnumMap[instance.type]!,
       'urls': instance.urls,
       'caption': instance.caption,
       'duration': instance.duration,
-      'status': instance.status,
+      'status': _$PostStatusEnumMap[instance.status]!,
       'createdAt': instance.createdAt.toIso8601String(),
       'likes': instance.likes,
       'saves': instance.saves,
@@ -45,13 +45,13 @@ Map<String, dynamic> _$PostModelToJson(_PostModel instance) =>
       'moderatedAt': instance.moderatedAt?.toIso8601String(),
     };
 
+const _$PostTypeEnumMap = {
+  PostType.video: 'video',
+  PostType.photo: 'photo',
+};
+
 const _$PostStatusEnumMap = {
   PostStatus.pending: 'pending',
   PostStatus.approved: 'approved',
   PostStatus.rejected: 'rejected',
-};
-
-const _$PostTypeEnumMap = {
-  PostType.video: 'video',
-  PostType.photo: 'photo',
 };

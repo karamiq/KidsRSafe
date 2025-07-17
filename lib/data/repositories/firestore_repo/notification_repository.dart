@@ -1,15 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:app/core/utils/constants/firestore_constants.dart';
 import '../../models/notification_model.dart';
+import 'package:riverpod/riverpod.dart';
+import '../../providers/firebase_provider.dart';
 
 typedef JsonMap = Map<String, dynamic>;
 
 class NotificationRepository {
-  final FirebaseFirestore firestore;
-  NotificationRepository({FirebaseFirestore? firestore})
-      : firestore = firestore ?? FirebaseFirestore.instance;
-  final CollectionReference<JsonMap> _notifications =
-      FirebaseFirestore.instance.collection(FirestoreCollections.notifications);
+  final Ref ref;
+  NotificationRepository({required this.ref});
+  FirebaseFirestore get firestore => ref.read(firestoreProvider);
+  CollectionReference<JsonMap> get _notifications => firestore.collection(FirestoreCollections.notifications);
 
   Future<void> sendNotification({
     required String userId,

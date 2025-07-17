@@ -9,6 +9,7 @@ class Utils {
     if (text == null) return;
     SnackBar snackBar = SnackBar(
       content: Text(text),
+      duration: Durations.long4,
       behavior: SnackBarBehavior.floating,
       backgroundColor: colorSchemeNotifier.value.error,
     );
