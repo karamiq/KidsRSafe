@@ -8,29 +8,19 @@ import 'components/profile_stats.dart';
 import 'components/profile_action_button.dart';
 
 class ProfilePage extends ConsumerWidget {
-  final String? userId;
-  const ProfilePage({super.key, this.userId});
+  final String userId;
+  const ProfilePage({super.key, required this.userId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    if (userId == null) {
-      final user = ref.watch(userProvider);
-      if (user == null) {
-        return const Scaffold(
-          body: Center(child: CircularProgressIndicator()),
-        );
-      }
-      return _ProfileScaffold(user: user);
-    } else {
-      final userAsync = ref.watch(userProfileProvider(userId!));
-      return userAsync.when(
-        data: (user) => user == null
-            ? const Scaffold(body: Center(child: Text('User not found')))
-            : _ProfileScaffold(user: user),
-        loading: () => const Scaffold(body: Center(child: CircularProgressIndicator())),
-        error: (e, st) => Scaffold(body: Center(child: Text('Error: $e'))),
-      );
-    }
+    final userAsync = ref.watch(userProfileProvider(userId));
+    return userAsync.when(
+      data: (user) => user == null
+          ? const Scaffold(body: Center(child: Text('User not found')))
+          : _ProfileScaffold(user: user),
+      loading: () => const Scaffold(body: Center(child: CircularProgressIndicator())),
+      error: (e, st) => Scaffold(body: Center(child: Text('Error: $e'))),
+    );
   }
 }
 
@@ -49,42 +39,63 @@ class _ProfileScaffold extends ConsumerWidget {
     final isOwnProfile = currentUser?.uid == user.uid;
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
-      appBar: AppBar(
-        elevation: 0,
-        automaticallyImplyLeading: true,
-      ),
-      body: Column(
-        children: [
-          ProfileHeader(user: user),
-          ProfileStats(),
-          const SizedBox(height: 12),
-          if (isOwnProfile)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 32),
-              child: SizedBox(
-                width: double.infinity,
-                child: OutlinedButton(
-                  onPressed: () {},
-                  child: const Text('Edit Profile'),
+      body: SafeArea(
+        child: Column(
+          children: [
+            ProfileHeader(user: user),
+            ProfileStats(),
+            const SizedBox(height: 12),
+            if (isOwnProfile)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 32),
+                child: Column(
+                  children: [
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton(
+                        onPressed: () {},
+                        child: const Text('Edit Profile'),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Theme.of(context).colorScheme.error,
+                          foregroundColor: Theme.of(context).colorScheme.onError,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        icon: const Icon(Icons.logout),
+                        label: const Text('Logout'),
+                        onPressed: () async {
+                          await ref.read(userProvider.notifier).logout();
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            else
+              ProfileActionButton(user: user),
+            const SizedBox(height: 16),
+            Divider(),
+            Expanded(
+              child: Center(
+                child: Text(
+                  'Profile content goes here',
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyLarge
+                      ?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
                 ),
               ),
-            )
-          else
-            ProfileActionButton(user: user),
-          const SizedBox(height: 16),
-          Divider(),
-          Expanded(
-            child: Center(
-              child: Text(
-                'Profile content goes here',
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyLarge
-                    ?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
-              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -15,10 +15,8 @@ class PostContentOverlay extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.watch(userProvider);
-
     return Positioned(
-      bottom: MediaQuery.of(context).size.height * 0.08,
+      bottom: MediaQuery.of(context).size.height * 0.09,
       left: Insets.small,
       right: MediaQuery.of(context).size.width * 0.35,
       child: Column(
@@ -26,7 +24,7 @@ class PostContentOverlay extends ConsumerWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           // Compact user info
-          _buildCompactUserInfo(context, user),
+          _buildCompactUserInfo(context, post.user),
           const SizedBox(height: 6),
 
           // Compact caption

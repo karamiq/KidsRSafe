@@ -20,6 +20,7 @@ abstract class UserModel with _$UserModel {
     required UserStatus status,
     required String? assignedModerator,
     @Default(false) bool parentalApproved,
+    @Default(<String>[]) List<String> fcmTokens, // Default to empty list
   }) = _UserModel;
   factory UserModel.fromJson(Map<String, dynamic> json) => _$UserModelFromJson(json);
 }

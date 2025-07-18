@@ -1,5 +1,6 @@
 import 'package:app/core/utils/annotations/json_serializable.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'user_model.dart';
 
 part 'post_model.freezed.dart';
 part 'post_model.g.dart';
@@ -22,13 +23,14 @@ enum PostType {
   photo;
 }
 
+// Application model: contains full UserModel
 @freezed
 abstract class PostModel with _$PostModel {
   @jsonSerializable
   const factory PostModel({
     required String uid,
     required String title,
-    required String userUid,
+    required UserModel user,
     required PostType type,
     required List<String> urls,
     required String caption,

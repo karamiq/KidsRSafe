@@ -35,12 +35,12 @@ class _EntryPointState extends ConsumerState<EntryPoint> {
       if (location.startsWith(RoutesDocument.home)) return 0;
       if (location.startsWith(RoutesDocument.search)) return 1;
       if (location.startsWith(RoutesDocument.inbox)) return 2;
-      if (location.startsWith(RoutesDocument.profile)) return 3;
+      if (location.startsWith('/profiles/')) return 3;
     } else {
       if (location.startsWith(RoutesDocument.home)) return 0;
       if (location.startsWith(RoutesDocument.search)) return 1;
       if (location.startsWith(RoutesDocument.inbox)) return 3;
-      if (location.startsWith(RoutesDocument.profile)) return 4;
+      if (location.startsWith('/profiles/')) return 4;
     }
     return 0;
   }
@@ -56,6 +56,14 @@ class _EntryPointState extends ConsumerState<EntryPoint> {
     }
     final pages = isKid ? pagesIsKid : pagesIsNotKid;
     if (index >= 0 && index < pages.length && (isKid || index != 2)) {
+      // Special handling for profile navigation
+      if ((isKid && index == 3) || (!isKid && index == 4)) {
+        final user = ref.read(userProvider);
+        if (user != null) {
+          GoRouter.of(context).go('/profiles/${user.uid}');
+        }
+        return;
+      }
       GoRouter.of(context).go(pages[index]);
     }
   }

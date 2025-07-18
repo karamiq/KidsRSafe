@@ -26,6 +26,7 @@ mixin _$UserModel {
   UserStatus get status;
   String? get assignedModerator;
   bool get parentalApproved;
+  List<String> get fcmTokens;
 
   /// Create a copy of UserModel
   /// with the given fields replaced by the non-null parameter values.
@@ -60,7 +61,8 @@ mixin _$UserModel {
             (identical(other.assignedModerator, assignedModerator) ||
                 other.assignedModerator == assignedModerator) &&
             (identical(other.parentalApproved, parentalApproved) ||
-                other.parentalApproved == parentalApproved));
+                other.parentalApproved == parentalApproved) &&
+            const DeepCollectionEquality().equals(other.fcmTokens, fcmTokens));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -78,11 +80,12 @@ mixin _$UserModel {
       createdAt,
       status,
       assignedModerator,
-      parentalApproved);
+      parentalApproved,
+      const DeepCollectionEquality().hash(fcmTokens));
 
   @override
   String toString() {
-    return 'UserModel(uid: $uid, email: $email, name: $name, username: $username, profilePicture: $profilePicture, role: $role, dateOfBirth: $dateOfBirth, parentEmail: $parentEmail, createdAt: $createdAt, status: $status, assignedModerator: $assignedModerator, parentalApproved: $parentalApproved)';
+    return 'UserModel(uid: $uid, email: $email, name: $name, username: $username, profilePicture: $profilePicture, role: $role, dateOfBirth: $dateOfBirth, parentEmail: $parentEmail, createdAt: $createdAt, status: $status, assignedModerator: $assignedModerator, parentalApproved: $parentalApproved, fcmTokens: $fcmTokens)';
   }
 }
 
@@ -103,7 +106,8 @@ abstract mixin class $UserModelCopyWith<$Res> {
       DateTime createdAt,
       UserStatus status,
       String? assignedModerator,
-      bool parentalApproved});
+      bool parentalApproved,
+      List<String> fcmTokens});
 }
 
 /// @nodoc
@@ -130,6 +134,7 @@ class _$UserModelCopyWithImpl<$Res> implements $UserModelCopyWith<$Res> {
     Object? status = null,
     Object? assignedModerator = freezed,
     Object? parentalApproved = null,
+    Object? fcmTokens = null,
   }) {
     return _then(_self.copyWith(
       uid: null == uid
@@ -180,6 +185,10 @@ class _$UserModelCopyWithImpl<$Res> implements $UserModelCopyWith<$Res> {
           ? _self.parentalApproved
           : parentalApproved // ignore: cast_nullable_to_non_nullable
               as bool,
+      fcmTokens: null == fcmTokens
+          ? _self.fcmTokens
+          : fcmTokens // ignore: cast_nullable_to_non_nullable
+              as List<String>,
     ));
   }
 }
@@ -289,7 +298,8 @@ extension UserModelPatterns on UserModel {
             DateTime createdAt,
             UserStatus status,
             String? assignedModerator,
-            bool parentalApproved)?
+            bool parentalApproved,
+            List<String> fcmTokens)?
         $default, {
     required TResult orElse(),
   }) {
@@ -308,7 +318,8 @@ extension UserModelPatterns on UserModel {
             _that.createdAt,
             _that.status,
             _that.assignedModerator,
-            _that.parentalApproved);
+            _that.parentalApproved,
+            _that.fcmTokens);
       case _:
         return orElse();
     }
@@ -341,7 +352,8 @@ extension UserModelPatterns on UserModel {
             DateTime createdAt,
             UserStatus status,
             String? assignedModerator,
-            bool parentalApproved)
+            bool parentalApproved,
+            List<String> fcmTokens)
         $default,
   ) {
     final _that = this;
@@ -359,7 +371,8 @@ extension UserModelPatterns on UserModel {
             _that.createdAt,
             _that.status,
             _that.assignedModerator,
-            _that.parentalApproved);
+            _that.parentalApproved,
+            _that.fcmTokens);
       case _:
         throw StateError('Unexpected subclass');
     }
@@ -391,7 +404,8 @@ extension UserModelPatterns on UserModel {
             DateTime createdAt,
             UserStatus status,
             String? assignedModerator,
-            bool parentalApproved)?
+            bool parentalApproved,
+            List<String> fcmTokens)?
         $default,
   ) {
     final _that = this;
@@ -409,7 +423,8 @@ extension UserModelPatterns on UserModel {
             _that.createdAt,
             _that.status,
             _that.assignedModerator,
-            _that.parentalApproved);
+            _that.parentalApproved,
+            _that.fcmTokens);
       case _:
         return null;
     }
@@ -432,7 +447,9 @@ class _UserModel implements UserModel {
       required this.createdAt,
       required this.status,
       required this.assignedModerator,
-      this.parentalApproved = false});
+      this.parentalApproved = false,
+      final List<String> fcmTokens = const <String>[]})
+      : _fcmTokens = fcmTokens;
   factory _UserModel.fromJson(Map<String, dynamic> json) =>
       _$UserModelFromJson(json);
 
@@ -461,6 +478,14 @@ class _UserModel implements UserModel {
   @override
   @JsonKey()
   final bool parentalApproved;
+  final List<String> _fcmTokens;
+  @override
+  @JsonKey()
+  List<String> get fcmTokens {
+    if (_fcmTokens is EqualUnmodifiableListView) return _fcmTokens;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_fcmTokens);
+  }
 
   /// Create a copy of UserModel
   /// with the given fields replaced by the non-null parameter values.
@@ -500,7 +525,9 @@ class _UserModel implements UserModel {
             (identical(other.assignedModerator, assignedModerator) ||
                 other.assignedModerator == assignedModerator) &&
             (identical(other.parentalApproved, parentalApproved) ||
-                other.parentalApproved == parentalApproved));
+                other.parentalApproved == parentalApproved) &&
+            const DeepCollectionEquality()
+                .equals(other._fcmTokens, _fcmTokens));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -518,11 +545,12 @@ class _UserModel implements UserModel {
       createdAt,
       status,
       assignedModerator,
-      parentalApproved);
+      parentalApproved,
+      const DeepCollectionEquality().hash(_fcmTokens));
 
   @override
   String toString() {
-    return 'UserModel(uid: $uid, email: $email, name: $name, username: $username, profilePicture: $profilePicture, role: $role, dateOfBirth: $dateOfBirth, parentEmail: $parentEmail, createdAt: $createdAt, status: $status, assignedModerator: $assignedModerator, parentalApproved: $parentalApproved)';
+    return 'UserModel(uid: $uid, email: $email, name: $name, username: $username, profilePicture: $profilePicture, role: $role, dateOfBirth: $dateOfBirth, parentEmail: $parentEmail, createdAt: $createdAt, status: $status, assignedModerator: $assignedModerator, parentalApproved: $parentalApproved, fcmTokens: $fcmTokens)';
   }
 }
 
@@ -546,7 +574,8 @@ abstract mixin class _$UserModelCopyWith<$Res>
       DateTime createdAt,
       UserStatus status,
       String? assignedModerator,
-      bool parentalApproved});
+      bool parentalApproved,
+      List<String> fcmTokens});
 }
 
 /// @nodoc
@@ -573,6 +602,7 @@ class __$UserModelCopyWithImpl<$Res> implements _$UserModelCopyWith<$Res> {
     Object? status = null,
     Object? assignedModerator = freezed,
     Object? parentalApproved = null,
+    Object? fcmTokens = null,
   }) {
     return _then(_UserModel(
       uid: null == uid
@@ -623,6 +653,10 @@ class __$UserModelCopyWithImpl<$Res> implements _$UserModelCopyWith<$Res> {
           ? _self.parentalApproved
           : parentalApproved // ignore: cast_nullable_to_non_nullable
               as bool,
+      fcmTokens: null == fcmTokens
+          ? _self._fcmTokens
+          : fcmTokens // ignore: cast_nullable_to_non_nullable
+              as List<String>,
     ));
   }
 }

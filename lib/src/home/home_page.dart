@@ -1,6 +1,5 @@
 import 'package:app/common_lib.dart';
 import 'package:app/data/models/post_model.dart';
-import 'package:app/data/models/user_model.dart';
 import 'package:app/data/providers/post_provider.dart';
 import 'package:app/data/providers/user_provider.dart';
 import 'package:app/src/home/components/post_media_view.dart';
@@ -16,6 +15,7 @@ class HomePage extends ConsumerStatefulWidget {
 
 class _HomePageState extends ConsumerState<HomePage> {
   final PageController _pageController = PageController();
+  bool _scrolledToPost = false;
 
   @override
   void dispose() {
@@ -33,7 +33,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           post: post,
           currentUserId: currentUserId,
           onCommentAdded: () {
-            ref.read(postsProvider.notifier).refreshPosts();
+            ref.refresh(getPostsProvider);
           },
         );
       },
@@ -73,7 +73,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: () => context.pop(),
               child: const Text('Cancel'),
             ),
           ],
@@ -84,10 +84,10 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final postsAsync = ref.watch(postsProvider);
+    final postsAsync = ref.watch(getPostsProvider);
     final currentUser = ref.watch(userProvider);
-    final userRole = ref.watch(userProvider)?.role;
-    final isKid = userRole == UserRole.kid;
+    final goRouterState = GoRouterState.of(context);
+    final postId = goRouterState.uri.queryParameters['postId'];
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -108,55 +108,50 @@ class _HomePageState extends ConsumerState<HomePage> {
               ),
               const SizedBox(height: 16),
               ElevatedButton(
-                onPressed: () => ref.read(postsProvider.notifier).refreshPosts(),
+                onPressed: () => ref.refresh(getPostsProvider),
                 child: const Text('Retry'),
               ),
             ],
           ),
         ),
-        data: (posts) => PageView.builder(
-          controller: _pageController,
-          scrollDirection: Axis.vertical,
-          itemCount: posts.length + (ref.read(postsProvider.notifier).hasMore ? 1 : 0),
-          onPageChanged: (index) {
-            // Load more posts when user is about to reach the end (2 posts before the end)
-            if (index >= posts.length - 2 &&
-                ref.read(postsProvider.notifier).hasMore &&
-                !ref.read(postsProvider.notifier).isLoading) {
-              ref.read(postsProvider.notifier).loadMorePosts();
+        data: (posts) {
+          // If postId is provided, scroll to that post
+          if (!_scrolledToPost && postId != null && posts.isNotEmpty) {
+            final index = posts.indexWhere((p) => p.uid == postId);
+            if (index != -1) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                _pageController.jumpToPage(index);
+              });
+              _scrolledToPost = true;
             }
-
-            // Increment views for the current post
-            if (index < posts.length) {
+          }
+          return PageView.builder(
+            controller: _pageController,
+            scrollDirection: Axis.vertical,
+            itemCount: posts.length,
+            onPageChanged: (index) {
+              // Increment views for the current post
+              if (index < posts.length) {
+                // Optionally: ref.read(postActionsProvider.notifier).incrementViews(posts[index].uid);
+              }
+            },
+            itemBuilder: (context, index) {
+              final post = posts[index];
               final currentUserId = currentUser?.uid ?? 'anonymous';
-              ref.read(postActionsProvider.notifier).incrementViews(posts[index].uid);
-            }
-          },
-          itemBuilder: (context, index) {
-            if (index >= posts.length) {
-              // Show loading indicator for next page
-              return const Center(
-                child: CircularProgressIndicator(
-                  color: Colors.white,
-                ),
+
+              return PostMediaView(
+                post: post,
+                onLike: () {
+                  // Handle like functionality
+                },
+                onComment: () => _showCommentDialog(context, post, currentUserId),
+                onShare: () => _showShareDialog(context, post),
+                isLiked: false,
+                isSaved: false,
               );
-            }
-
-            final post = posts[index];
-            final currentUserId = currentUser?.uid ?? 'anonymous';
-
-            return PostMediaView(
-              post: post,
-              onLike: () {
-                // Handle like functionality
-              },
-              onComment: () => _showCommentDialog(context, post, currentUserId),
-              onShare: () => _showShareDialog(context, post),
-              isLiked: false,
-              isSaved: false,
-            );
-          },
-        ),
+            },
+          );
+        },
       ),
     );
   }

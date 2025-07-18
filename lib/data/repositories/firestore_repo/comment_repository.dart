@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../models/comment_model.dart';
 import '../../models/notification_model.dart';
-import 'post_repository.dart';
+import 'posts/post_repository.dart';
 import 'notification_repository.dart';
 import 'package:riverpod/riverpod.dart';
 import '../../providers/firebase_provider.dart';
@@ -43,9 +43,9 @@ class CommentRepository {
 
     // Get post to find post owner
     final post = await _postRepo.getPost(postId);
-    if (post != null && userId != post.userUid) {
+    if (post != null && userId != post.user.uid) {
       await _notificationRepo.sendNotification(
-        userId: post.userUid,
+        userId: post.user.uid,
         title: 'New Comment',
         body: 'Someone commented on your post.',
         type: NotificationType.comment,

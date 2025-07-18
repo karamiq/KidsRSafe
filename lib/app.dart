@@ -1,3 +1,4 @@
+import 'package:app/common_lib.dart';
 import 'package:app/data/providers/firebase_provider.dart';
 import 'package:app/main.dart';
 import 'package:app/router/app_router.dart';
@@ -13,6 +14,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:app/core/services/local_notifications_services.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:flutter/services.dart';
 
 class App extends ConsumerStatefulWidget {
   const App({super.key});
@@ -28,6 +30,11 @@ class _AppState extends ConsumerState<App> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       LocalNotificationsServices.initialize();
       ref.read(firebaseMessegingServiceProvider).initialize();
+    });
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      LocalNotificationsServices.showNotification(message);
+      final data = message.data;
+      context.push(data['route']);
     });
   }
 
@@ -76,4 +83,13 @@ class _AppState extends ConsumerState<App> {
       ),
     );
   }
+}
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+  runApp(const ProviderScope(child: App()));
 }

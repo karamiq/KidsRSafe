@@ -6,21 +6,22 @@ part of 'post_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$postsHash() => r'9314b084a11ce6b7500be5b802ada8bc3a56877e';
+String _$getPostsHash() => r'b75926f27910011b88b3a1d184a5110617c02967';
 
-/// See also [Posts].
-@ProviderFor(Posts)
-final postsProvider =
-    AutoDisposeAsyncNotifierProvider<Posts, List<PostModel>>.internal(
-  Posts.new,
-  name: r'postsProvider',
+/// See also [getPosts].
+@ProviderFor(getPosts)
+final getPostsProvider = AutoDisposeFutureProvider<List<PostModel>>.internal(
+  getPosts,
+  name: r'getPostsProvider',
   debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$postsHash,
+      const bool.fromEnvironment('dart.vm.product') ? null : _$getPostsHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$Posts = AutoDisposeAsyncNotifier<List<PostModel>>;
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef GetPostsRef = AutoDisposeFutureProviderRef<List<PostModel>>;
 String _$postActionsHash() => r'35148d7ee4aa119b31b01a3f403d107b06585f9c';
 
 /// See also [PostActions].

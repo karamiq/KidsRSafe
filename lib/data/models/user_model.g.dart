@@ -19,6 +19,10 @@ _UserModel _$UserModelFromJson(Map<String, dynamic> json) => _UserModel(
       status: $enumDecode(_$UserStatusEnumMap, json['status']),
       assignedModerator: json['assignedModerator'] as String?,
       parentalApproved: json['parentalApproved'] as bool? ?? false,
+      fcmTokens: (json['fcmTokens'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const <String>[],
     );
 
 Map<String, dynamic> _$UserModelToJson(_UserModel instance) =>
@@ -35,6 +39,7 @@ Map<String, dynamic> _$UserModelToJson(_UserModel instance) =>
       'status': _$UserStatusEnumMap[instance.status]!,
       'assignedModerator': instance.assignedModerator,
       'parentalApproved': instance.parentalApproved,
+      'fcmTokens': instance.fcmTokens,
     };
 
 const _$UserRoleEnumMap = {

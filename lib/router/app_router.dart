@@ -32,23 +32,12 @@ final router = GoRouter(
   redirect: (context, state) async {
     final sharedPreferences = await SharedPreferences.getInstance();
     final authenticationRaw = sharedPreferences.getString(Preferences.authentication);
-
-    // Check both SharedPreferences and Firebase Auth
-    final firebaseUser = FirebaseAuth.instance.currentUser;
-
-    // Allow access to login and register pages even when not authenticated
-    if (state.matchedLocation == RoutesDocument.login || state.matchedLocation == RoutesDocument.register) {
+    print(authenticationRaw);
+    // Allow access to register page even when not authenticated
+    if (state.matchedLocation == RoutesDocument.register) {
       return null;
     }
-
-    if (authenticationRaw == null && firebaseUser == null) {
-      return RoutesDocument.login;
-    }
-
-    // If Firebase Auth user exists but no SharedPreferences, redirect to login
-    if (authenticationRaw == null && firebaseUser != null) {
-      // Sign out from Firebase Auth to maintain consistency
-      await FirebaseAuth.instance.signOut();
+    if (authenticationRaw == null || FirebaseAuth.instance.currentUser == null) {
       return RoutesDocument.login;
     }
 
@@ -88,9 +77,18 @@ final router = GoRouter(
         ),
         GoRoute(
           parentNavigatorKey: _shellNavigatorKey,
-          path: RoutesDocument.profile,
-          builder: (context, state) => const ProfilePage(),
+          path: '/profiles/:userUid',
+          builder: (context, state) {
+            final userUid = state.pathParameters['userUid']!;
+            return ProfilePage(userId: userUid);
+          },
         ),
+        // Optionally remove or update the static /profile route if not needed
+        // GoRoute(
+        //   parentNavigatorKey: _shellNavigatorKey,
+        //   path: RoutesDocument.profile,
+        //   builder: (context, state) => const ProfilePage(),
+        // ),
         GoRoute(
           path: RoutesDocument.search,
           builder: (context, state) => const SearchPage(),

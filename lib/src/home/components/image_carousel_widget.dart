@@ -57,20 +57,22 @@ class _ImageCarouselWidgetState extends State<ImageCarouselWidget> {
 
   Widget _buildPageIndicator() {
     return Positioned(
-      bottom: Insets.extraLarge,
+      bottom: Insets.medium,
       left: 0,
       right: 0,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: List.generate(
-          widget.imageUrls.length,
-          (index) => Container(
-            width: 8,
-            height: 8,
-            margin: EdgeInsets.symmetric(horizontal: Insets.extraSmall),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: _currentImageIndex == index ? Colors.white : Colors.white.withOpacity(0.5),
+      child: SafeArea(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(
+            widget.imageUrls.length,
+            (index) => Container(
+              width: 8,
+              height: 8,
+              margin: EdgeInsets.symmetric(horizontal: Insets.extraSmall),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: _currentImageIndex == index ? Colors.white : Colors.white.withOpacity(0.5),
+              ),
             ),
           ),
         ),

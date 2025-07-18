@@ -44,12 +44,11 @@ class VideoControls extends StatelessWidget {
             color: Colors.transparent,
             child: SafeArea(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Padding(
                     padding: EdgeInsets.symmetric(
-                      horizontal: Insets.small,
-                      vertical: Insets.extraSmall,
+                      horizontal: Insets.medium,
                     ),
                     child: Text(
                       '${_formatDuration(Duration(seconds: position))} / ${_formatDuration(duration)}',

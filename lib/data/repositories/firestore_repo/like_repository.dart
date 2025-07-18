@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../models/like_model.dart';
 import '../../models/notification_model.dart';
-import 'post_repository.dart';
+import 'posts/post_repository.dart';
 import 'notification_repository.dart';
 import 'package:riverpod/riverpod.dart';
 import '../../providers/firebase_provider.dart';

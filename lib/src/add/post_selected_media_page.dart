@@ -18,6 +18,22 @@ class PostSelectedMediaPage extends HookConsumerWidget {
     final titleController = useTextEditingController();
     final captionController = useTextEditingController();
     final isLoading = useState<bool>(false);
+    final titleLength = useState<int>(0);
+    final captionLength = useState<int>(0);
+
+    useEffect(() {
+      void titleListener() => titleLength.value = titleController.text.length;
+      void captionListener() => captionLength.value = captionController.text.length;
+      titleController.addListener(titleListener);
+      captionController.addListener(captionListener);
+      // Set initial values
+      titleLength.value = titleController.text.length;
+      captionLength.value = captionController.text.length;
+      return () {
+        titleController.removeListener(titleListener);
+        captionController.removeListener(captionListener);
+      };
+    }, [titleController, captionController]);
 
     Future<void> submitPost() async {
       if (titleController.text.trim().isEmpty || captionController.text.trim().isEmpty || media.isEmpty) {
@@ -54,7 +70,7 @@ class PostSelectedMediaPage extends HookConsumerWidget {
           ),
         );
 
-        context.go('/');
+        context.go(RoutesDocument.home);
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -145,6 +161,9 @@ class PostSelectedMediaPage extends HookConsumerWidget {
               const SizedBox(height: 8),
               TextField(
                 controller: titleController,
+                inputFormatters: [
+                  LengthLimitingTextInputFormatter(60), // limit title to 60 characters
+                ],
                 decoration: InputDecoration(
                   hintText: 'Enter a title for your post...',
                   border: OutlineInputBorder(
@@ -152,8 +171,10 @@ class PostSelectedMediaPage extends HookConsumerWidget {
                   ),
                   filled: true,
                   fillColor: context.colorScheme.surfaceContainerLowest,
+                  counterText: '${titleLength.value}/60',
                 ),
                 style: context.textTheme.bodyLarge,
+                maxLength: 60,
               ),
               const SizedBox(height: 16),
               Text(
@@ -166,7 +187,6 @@ class PostSelectedMediaPage extends HookConsumerWidget {
               TextField(
                 controller: captionController,
                 maxLines: null,
-                // make the text field larger to accommodate more text
                 keyboardType: TextInputType.multiline,
                 inputFormatters: [
                   LengthLimitingTextInputFormatter(500), // limit caption to 500 characters
@@ -178,8 +198,10 @@ class PostSelectedMediaPage extends HookConsumerWidget {
                   ),
                   filled: true,
                   fillColor: context.colorScheme.surfaceContainerLowest,
+                  counterText: '${captionLength.value}/500',
                 ),
                 style: context.textTheme.bodyLarge,
+                maxLength: 500,
               ),
               const SizedBox(height: 24),
               SizedBox(

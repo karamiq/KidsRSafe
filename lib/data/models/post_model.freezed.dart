@@ -16,7 +16,7 @@ T _$identity<T>(T value) => value;
 mixin _$PostModel {
   String get uid;
   String get title;
-  String get userUid;
+  UserModel get user;
   PostType get type;
   List<String> get urls;
   String get caption;
@@ -47,7 +47,7 @@ mixin _$PostModel {
             other is PostModel &&
             (identical(other.uid, uid) || other.uid == uid) &&
             (identical(other.title, title) || other.title == title) &&
-            (identical(other.userUid, userUid) || other.userUid == userUid) &&
+            (identical(other.user, user) || other.user == user) &&
             (identical(other.type, type) || other.type == type) &&
             const DeepCollectionEquality().equals(other.urls, urls) &&
             (identical(other.caption, caption) || other.caption == caption) &&
@@ -73,7 +73,7 @@ mixin _$PostModel {
       runtimeType,
       uid,
       title,
-      userUid,
+      user,
       type,
       const DeepCollectionEquality().hash(urls),
       caption,
@@ -89,7 +89,7 @@ mixin _$PostModel {
 
   @override
   String toString() {
-    return 'PostModel(uid: $uid, title: $title, userUid: $userUid, type: $type, urls: $urls, caption: $caption, duration: $duration, status: $status, createdAt: $createdAt, likes: $likes, saves: $saves, views: $views, comments: $comments, moderatorUid: $moderatorUid, moderatedAt: $moderatedAt)';
+    return 'PostModel(uid: $uid, title: $title, user: $user, type: $type, urls: $urls, caption: $caption, duration: $duration, status: $status, createdAt: $createdAt, likes: $likes, saves: $saves, views: $views, comments: $comments, moderatorUid: $moderatorUid, moderatedAt: $moderatedAt)';
   }
 }
 
@@ -101,7 +101,7 @@ abstract mixin class $PostModelCopyWith<$Res> {
   $Res call(
       {String uid,
       String title,
-      String userUid,
+      UserModel user,
       PostType type,
       List<String> urls,
       String caption,
@@ -114,6 +114,8 @@ abstract mixin class $PostModelCopyWith<$Res> {
       int comments,
       String? moderatorUid,
       DateTime? moderatedAt});
+
+  $UserModelCopyWith<$Res> get user;
 }
 
 /// @nodoc
@@ -130,7 +132,7 @@ class _$PostModelCopyWithImpl<$Res> implements $PostModelCopyWith<$Res> {
   $Res call({
     Object? uid = null,
     Object? title = null,
-    Object? userUid = null,
+    Object? user = null,
     Object? type = null,
     Object? urls = null,
     Object? caption = null,
@@ -153,10 +155,10 @@ class _$PostModelCopyWithImpl<$Res> implements $PostModelCopyWith<$Res> {
           ? _self.title
           : title // ignore: cast_nullable_to_non_nullable
               as String,
-      userUid: null == userUid
-          ? _self.userUid
-          : userUid // ignore: cast_nullable_to_non_nullable
-              as String,
+      user: null == user
+          ? _self.user
+          : user // ignore: cast_nullable_to_non_nullable
+              as UserModel,
       type: null == type
           ? _self.type
           : type // ignore: cast_nullable_to_non_nullable
@@ -206,6 +208,16 @@ class _$PostModelCopyWithImpl<$Res> implements $PostModelCopyWith<$Res> {
           : moderatedAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
     ));
+  }
+
+  /// Create a copy of PostModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $UserModelCopyWith<$Res> get user {
+    return $UserModelCopyWith<$Res>(_self.user, (value) {
+      return _then(_self.copyWith(user: value));
+    });
   }
 }
 
@@ -305,7 +317,7 @@ extension PostModelPatterns on PostModel {
     TResult Function(
             String uid,
             String title,
-            String userUid,
+            UserModel user,
             PostType type,
             List<String> urls,
             String caption,
@@ -327,7 +339,7 @@ extension PostModelPatterns on PostModel {
         return $default(
             _that.uid,
             _that.title,
-            _that.userUid,
+            _that.user,
             _that.type,
             _that.urls,
             _that.caption,
@@ -363,7 +375,7 @@ extension PostModelPatterns on PostModel {
     TResult Function(
             String uid,
             String title,
-            String userUid,
+            UserModel user,
             PostType type,
             List<String> urls,
             String caption,
@@ -384,7 +396,7 @@ extension PostModelPatterns on PostModel {
         return $default(
             _that.uid,
             _that.title,
-            _that.userUid,
+            _that.user,
             _that.type,
             _that.urls,
             _that.caption,
@@ -419,7 +431,7 @@ extension PostModelPatterns on PostModel {
     TResult? Function(
             String uid,
             String title,
-            String userUid,
+            UserModel user,
             PostType type,
             List<String> urls,
             String caption,
@@ -440,7 +452,7 @@ extension PostModelPatterns on PostModel {
         return $default(
             _that.uid,
             _that.title,
-            _that.userUid,
+            _that.user,
             _that.type,
             _that.urls,
             _that.caption,
@@ -466,7 +478,7 @@ class _PostModel implements PostModel {
   const _PostModel(
       {required this.uid,
       required this.title,
-      required this.userUid,
+      required this.user,
       required this.type,
       required final List<String> urls,
       required this.caption,
@@ -488,7 +500,7 @@ class _PostModel implements PostModel {
   @override
   final String title;
   @override
-  final String userUid;
+  final UserModel user;
   @override
   final PostType type;
   final List<String> _urls;
@@ -542,7 +554,7 @@ class _PostModel implements PostModel {
             other is _PostModel &&
             (identical(other.uid, uid) || other.uid == uid) &&
             (identical(other.title, title) || other.title == title) &&
-            (identical(other.userUid, userUid) || other.userUid == userUid) &&
+            (identical(other.user, user) || other.user == user) &&
             (identical(other.type, type) || other.type == type) &&
             const DeepCollectionEquality().equals(other._urls, _urls) &&
             (identical(other.caption, caption) || other.caption == caption) &&
@@ -568,7 +580,7 @@ class _PostModel implements PostModel {
       runtimeType,
       uid,
       title,
-      userUid,
+      user,
       type,
       const DeepCollectionEquality().hash(_urls),
       caption,
@@ -584,7 +596,7 @@ class _PostModel implements PostModel {
 
   @override
   String toString() {
-    return 'PostModel(uid: $uid, title: $title, userUid: $userUid, type: $type, urls: $urls, caption: $caption, duration: $duration, status: $status, createdAt: $createdAt, likes: $likes, saves: $saves, views: $views, comments: $comments, moderatorUid: $moderatorUid, moderatedAt: $moderatedAt)';
+    return 'PostModel(uid: $uid, title: $title, user: $user, type: $type, urls: $urls, caption: $caption, duration: $duration, status: $status, createdAt: $createdAt, likes: $likes, saves: $saves, views: $views, comments: $comments, moderatorUid: $moderatorUid, moderatedAt: $moderatedAt)';
   }
 }
 
@@ -599,7 +611,7 @@ abstract mixin class _$PostModelCopyWith<$Res>
   $Res call(
       {String uid,
       String title,
-      String userUid,
+      UserModel user,
       PostType type,
       List<String> urls,
       String caption,
@@ -612,6 +624,9 @@ abstract mixin class _$PostModelCopyWith<$Res>
       int comments,
       String? moderatorUid,
       DateTime? moderatedAt});
+
+  @override
+  $UserModelCopyWith<$Res> get user;
 }
 
 /// @nodoc
@@ -628,7 +643,7 @@ class __$PostModelCopyWithImpl<$Res> implements _$PostModelCopyWith<$Res> {
   $Res call({
     Object? uid = null,
     Object? title = null,
-    Object? userUid = null,
+    Object? user = null,
     Object? type = null,
     Object? urls = null,
     Object? caption = null,
@@ -651,10 +666,10 @@ class __$PostModelCopyWithImpl<$Res> implements _$PostModelCopyWith<$Res> {
           ? _self.title
           : title // ignore: cast_nullable_to_non_nullable
               as String,
-      userUid: null == userUid
-          ? _self.userUid
-          : userUid // ignore: cast_nullable_to_non_nullable
-              as String,
+      user: null == user
+          ? _self.user
+          : user // ignore: cast_nullable_to_non_nullable
+              as UserModel,
       type: null == type
           ? _self.type
           : type // ignore: cast_nullable_to_non_nullable
@@ -704,6 +719,16 @@ class __$PostModelCopyWithImpl<$Res> implements _$PostModelCopyWith<$Res> {
           : moderatedAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
     ));
+  }
+
+  /// Create a copy of PostModel
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $UserModelCopyWith<$Res> get user {
+    return $UserModelCopyWith<$Res>(_self.user, (value) {
+      return _then(_self.copyWith(user: value));
+    });
   }
 }
 

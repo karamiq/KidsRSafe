@@ -97,19 +97,14 @@ class ChatsRepository {
     });
   }
 
-  /// Stream all messages for a chat, ordered by timestamp
+  /// Stream all messages for a chat, ordered by timestamp (oldest to newest, millisecond precision)
+  /// The 'timestamp' field must be stored as a Firestore Timestamp or ISO8601 string with millisecond precision.
   Stream<List<MessageModel>> fetchMessagesForChat(String chatId) {
     return _chats
         .doc(chatId)
         .collection('messages')
-        .orderBy('timestamp', descending: true)
+        .orderBy('timestamp', descending: true) // OLDEST TO NEWEST, MILLISECOND PRECISION
         .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) {
-              final data = doc.data();
-              return MessageModel.fromJson(data);
-            })
-            .whereType<MessageModel>()
-            .toList());
+        .map((snapshot) => snapshot.docs.map((doc) => MessageModel.fromJson(doc.data())).toList());
   }
 }

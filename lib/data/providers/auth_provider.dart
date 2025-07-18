@@ -5,6 +5,9 @@ import 'package:app/data/providers/user_provider.dart';
 import 'package:app/data/repositories/firestore_repo/firebase_request.dart';
 import '../providers/firebase_provider.dart';
 import '../../core/services/clients/_clients.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 part 'auth_provider.g.dart';
 
 @riverpod
@@ -65,8 +68,20 @@ class Auth extends _$Auth with AsyncXNotifierMixin<dynamic> {
             ));
       });
 
+  Future<void> _removeFcmTokenOnLogout() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+    final fcmToken = await FirebaseMessaging.instance.getToken();
+    if (fcmToken == null) return;
+    final userDoc = FirebaseFirestore.instance.collection('users').doc(user.uid);
+    await userDoc.update({
+      'fcmTokens': FieldValue.arrayRemove([fcmToken])
+    });
+  }
+
   @useResult
   RunXCallback<dynamic> logout() => handle(() async {
+        await _removeFcmTokenOnLogout();
         final firebaseAuth = ref.read(firebaseAuthProvider);
         await firebaseAuth.signOut();
         ref.read(userProvider.notifier).logout();

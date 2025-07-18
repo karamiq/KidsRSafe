@@ -7,7 +7,7 @@ import 'package:riverpod/riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../data/repositories/firestore_repo/user_repository.dart';
-import '../../data/repositories/firestore_repo/post_repository.dart';
+import '../repositories/firestore_repo/posts/post_repository.dart';
 import '../../data/repositories/firestore_repo/moderation_repository.dart';
 import '../../data/repositories/firestore_repo/notification_repository.dart';
 import '../../data/repositories/firestore_repo/like_repository.dart';

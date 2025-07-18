@@ -9,7 +9,7 @@ part of 'post_model.dart';
 _PostModel _$PostModelFromJson(Map<String, dynamic> json) => _PostModel(
       uid: json['uid'] as String,
       title: json['title'] as String,
-      userUid: json['userUid'] as String,
+      user: UserModel.fromJson(json['user'] as Map<String, dynamic>),
       type: $enumDecode(_$PostTypeEnumMap, json['type']),
       urls: (json['urls'] as List<dynamic>).map((e) => e as String).toList(),
       caption: json['caption'] as String,
@@ -30,7 +30,7 @@ Map<String, dynamic> _$PostModelToJson(_PostModel instance) =>
     <String, dynamic>{
       'uid': instance.uid,
       'title': instance.title,
-      'userUid': instance.userUid,
+      'user': instance.user.toJson(),
       'type': _$PostTypeEnumMap[instance.type]!,
       'urls': instance.urls,
       'caption': instance.caption,

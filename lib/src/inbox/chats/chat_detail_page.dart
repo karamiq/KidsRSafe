@@ -69,6 +69,7 @@ class _ChatDetailPageState extends ConsumerState<ChatDetailPage> {
     final currentUser = ref.watch(userProvider);
     final chatsRepository = ref.watch(chatsRepositoryProvider);
     final oppositeUser = widget.chat.oppositeUser;
+    final theme = context.theme;
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -78,7 +79,16 @@ class _ChatDetailPageState extends ConsumerState<ChatDetailPage> {
               child: ((oppositeUser.profilePicture.isEmpty)) ? const Icon(Icons.person) : null,
             ),
             const SizedBox(width: 12),
-            Text(oppositeUser.name),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(oppositeUser.name),
+                Text(
+                  oppositeUser.role.name,
+                  style: theme.textTheme.bodySmall,
+                ),
+              ],
+            ),
           ],
         ),
       ),
@@ -97,12 +107,10 @@ class _ChatDetailPageState extends ConsumerState<ChatDetailPage> {
                       return const Center(child: CircularProgressIndicator());
                     }
                     final messages = snapshot.data ?? [];
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      _scrollToBottom();
-                    });
                     if (messages.isEmpty) {
                       return const Center(child: Text('No messages yet.'));
                     }
+                    messages.sort((a, b) => b.timestamp.compareTo(a.timestamp));
                     return ListView.builder(
                       controller: _scrollController,
                       reverse: true,
@@ -114,17 +122,26 @@ class _ChatDetailPageState extends ConsumerState<ChatDetailPage> {
                         return Align(
                           alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
                           child: Container(
-                            margin: const EdgeInsets.symmetric(vertical: 2),
-                            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 14),
+                            margin: const EdgeInsets.symmetric(vertical: 4),
+                            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
                             constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.7),
                             decoration: BoxDecoration(
                               color: isMe
-                                  ? Theme.of(context).colorScheme.primary.withOpacity(0.85)
+                                  ? Theme.of(context).colorScheme.primary
                                   : Theme.of(context).colorScheme.surfaceVariant,
-                              borderRadius: BorderRadius.circular(16).copyWith(
-                                bottomLeft: isMe ? const Radius.circular(16) : const Radius.circular(0),
-                                bottomRight: isMe ? const Radius.circular(0) : const Radius.circular(16),
+                              borderRadius: BorderRadius.only(
+                                topLeft: const Radius.circular(18),
+                                topRight: const Radius.circular(18),
+                                bottomLeft: isMe ? const Radius.circular(18) : const Radius.circular(4),
+                                bottomRight: isMe ? const Radius.circular(4) : const Radius.circular(18),
                               ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.06),
+                                  blurRadius: 6,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
                             ),
                             child: Column(
                               crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
@@ -139,13 +156,13 @@ class _ChatDetailPageState extends ConsumerState<ChatDetailPage> {
                                   ),
                                 ),
                                 Padding(
-                                  padding: const EdgeInsets.only(top: 2.0),
+                                  padding: const EdgeInsets.only(top: 4.0),
                                   child: Text(
                                     msg.timestamp.formatTimeago(),
                                     style: Theme.of(context)
                                         .textTheme
                                         .bodySmall
-                                        ?.copyWith(fontSize: 11, color: Colors.grey),
+                                        ?.copyWith(fontSize: 11, color: Colors.white),
                                   ),
                                 ),
                               ],

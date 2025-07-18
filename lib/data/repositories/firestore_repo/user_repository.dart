@@ -4,7 +4,7 @@ import 'package:app/data/providers/user_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:app/core/utils/constants/firestore_constants.dart';
 import 'follow_repository.dart';
-import 'post_repository.dart';
+import 'posts/post_repository.dart';
 import 'save_repository.dart';
 import 'like_repository.dart';
 
