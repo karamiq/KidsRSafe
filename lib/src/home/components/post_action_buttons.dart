@@ -1,8 +1,6 @@
 import 'package:app/common_lib.dart';
 import 'package:app/data/models/post_model.dart';
 import 'package:flutter/material.dart';
-import 'package:app/core/utils/constants/sizes.dart';
-import 'package:go_router/go_router.dart';
 
 class PostActionButtons extends StatelessWidget {
   final PostModel post;

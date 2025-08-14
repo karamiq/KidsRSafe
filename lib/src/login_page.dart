@@ -23,6 +23,7 @@ class LoginPage extends ConsumerWidget {
         context.push(RoutesDocument.home);
       }, error: (e, t) {
         Utils.showErrorSnackBar(e.toString());
+        print('Login error: $e, $t');
       });
     }
 

@@ -1,13 +1,10 @@
 import 'package:app/common_lib.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:app/data/models/user_model.dart';
 import 'package:app/data/models/post_model.dart';
 import 'package:app/data/providers/user_provider.dart';
 import 'package:app/data/providers/firebase_provider.dart';
-import 'package:app/src/home/components/image_carousel_widget.dart';
 import 'package:app/src/home/components/video_player_widget.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'dart:async';
 
 class SearchPage extends HookConsumerWidget {

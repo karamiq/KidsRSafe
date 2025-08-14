@@ -62,4 +62,11 @@
         </intent>
     </queries>
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- For camera access -->
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <!-- For reading images/videos from storage (Android < 13) -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <!-- For Android 13+ -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO"/>
 </manifest>

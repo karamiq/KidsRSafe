@@ -1,6 +1,5 @@
 import 'package:app/data/models/post_model.dart';
 import 'package:app/data/models/user_model.dart';
-import 'package:app/data/providers/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:app/core/utils/constants/sizes.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
